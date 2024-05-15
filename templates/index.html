@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Calculator</title>
+</head>
+<body>
+    <h1>Nutrition Calculator</h1>
+    <form action="/result" method="post">
+        <label for="gender">성별:</label>
+        <select name="gender" id="gender">
+            <option value="남자">남자</option>
+            <option value="여자">여자</option>
+        </select><br>
+
+        <label for="age">나이:</label>
+        <input type="number" id="age" name="age"><br>
+
+        <label for="height">키 (cm):</label>
+        <input type="number" id="height" name="height"><br>
+
+        <label for="weight">몸무게 (kg):</label>
+        <input type="number" id="weight" name="weight"><br>
+
+        <label for="pa_level">PA 지수:</label>
+        <select name="pa_level" id="pa_level">
+            <option value="1">비활동적</option>
+            <option value="2">저활동적</option>
+            <option value="3">활동적</option>
+            <option value="4">매우 활동적</option>
+        </select><br>
+
+        <label for="diseases">질병 유무:</label><br>
+        <input type="checkbox" id="hypertension" name="diseases" value="고혈압">
+        <label for="hypertension">고혈압</label><br>
+        <input type="checkbox" id="diabetes" name="diseases" value="당뇨병">
+        <label for="diabetes">당뇨병</label><br>
+        <input type="checkbox" id="cancer" name="diseases" value="위암과 대장암">
+        <label for="cancer">위암과 대장암</label><br>
+        <input type="checkbox" id="hyperlipidemia" name="diseases" value="고지혈증">
+        <label for="hyperlipidemia">고지혈증</label><br>
+        <input type="checkbox" id="osteoporosis" name="diseases" value="골다공증">
+        <label for="osteoporosis">골다공증</label><br>
+
+        <h2>7일치 식단 입력</h2>
+        {% for i in range(1, 8) %}
+            <label for="day{{ i }}_menu">{{ i }}일차 식단:</label>
+            <input type="text" id="day{{ i }}_menu" name="day{{ i }}_menu" placeholder="예: 김밥, 짬뽕밥, 오므라이스"><br>
+        {% endfor %}
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

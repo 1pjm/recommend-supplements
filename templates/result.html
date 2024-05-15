@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Calculator Result</title>
+</head>
+<body>
+    <h1>결과</h1>
+    <p>BMI 지수: {{ bmi }}</p>
+    <p>PA 지수: {{ pa_index }}</p>
+    <h2>권장 섭취량</h2>
+    <ul>
+        <li>에너지: {{ requirements[0] }} kcal</li>
+        <li>탄수화물: {{ requirements[1] }} g</li>
+        <li>단백질: {{ requirements[2] }} g</li>
+        <li>지방: {{ requirements[3] }} g</li>
+        <li>칼슘: {{ requirements[4] }} mg</li>
+        <li>인: {{ requirements[5] }} mg</li>
+        <li>철: {{ requirements[6] }} mg</li>
+        <li>티아민: {{ requirements[7] }} mg</li>
+        <li>리보플라빈: {{ requirements[8] }} mg</li>
+        <li>니아신: {{ requirements[9] }} mg</li>
+        <li>비타민 C: {{ requirements[10] }} mg</li>
+    </ul>
+
+    <h2>하루 실제 영양소 섭취량</h2>
+    <ul>
+        {% for nutrient, value in average_nutrition_values.items() %}
+            <li>{{ nutrient }}: {{ value }}g</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
