@@ -49,4 +49,4 @@ def result():
     return render_template('result.html', bmi=bmi, pa_index=pa_index, requirements=requirements, average_nutrition_values=average_nutrition_values)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
