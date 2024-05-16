@@ -7,6 +7,9 @@ import pandas as pd
 app = Flask(__name__)
 engine = create_engine('sqlite:///nutrition.db')
 
+# Jinja2 템플릿 환경에 zip과 abs 함수를 추가
+app.jinja_env.globals.update(zip=zip, abs=abs)
+
 @app.route('/')
 def index():
     return render_template('index.html')
