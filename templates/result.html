@@ -23,11 +23,22 @@
         <li>니아신: {{ requirements[9] }} mg</li>
         <li>비타민 C: {{ requirements[10] }} mg</li>
     </ul>
-
     <h2>하루 실제 영양소 섭취량</h2>
     <ul>
         {% for nutrient, value in average_nutrition_values.items() %}
-            <li>{{ nutrient }}: {{ value }}</li>
+            <li>{{ nutrient }}: {{ value }} g</li>
+        {% endfor %}
+    </ul>
+    <h2>영양소 섭취량 비교</h2>
+    <ul>
+        {% for nutrient, diff in zip(average_nutrition_values.keys(), gap) %}
+            {% if diff > 0 %}
+                <li>{{ nutrient }}을(를) {{ diff }}g 부족하게 섭취했습니다.</li>
+            {% elif diff < 0 %}
+                <li>{{ nutrient }}을(를) {{ abs(diff) }}g 과도하게 섭취했습니다.</li>
+            {% else %}
+                <li>{{ nutrient }}을(를) 적절하게 섭취했습니다.</li>
+            {% endif %}
         {% endfor %}
     </ul>
 </body>

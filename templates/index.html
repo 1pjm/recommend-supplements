@@ -43,11 +43,20 @@
         <input type="checkbox" id="osteoporosis" name="diseases" value="골다공증">
         <label for="osteoporosis">골다공증</label><br>
 
-        <h2>7일치 식단 입력</h2>
-        {% for i in range(1, 8) %}
-            <label for="day{{ i }}_menu">{{ i }}일차 식단:</label>
-            <input type="text" id="day{{ i }}_menu" name="day{{ i }}_menu" placeholder="예: 김밥, 짬뽕밥, 오므라이스"><br>
-        {% endfor %}
+        <label for="day1_menu">1일차 식단:</label>
+        <input type="text" id="day1_menu" name="day1_menu"><br>
+        <label for="day2_menu">2일차 식단:</label>
+        <input type="text" id="day2_menu" name="day2_menu"><br>
+        <label for="day3_menu">3일차 식단:</label>
+        <input type="text" id="day3_menu" name="day3_menu"><br>
+        <label for="day4_menu">4일차 식단:</label>
+        <input type="text" id="day4_menu" name="day4_menu"><br>
+        <label for="day5_menu">5일차 식단:</label>
+        <input type="text" id="day5_menu" name="day5_menu"><br>
+        <label for="day6_menu">6일차 식단:</label>
+        <input type="text" id="day6_menu" name="day6_menu"><br>
+        <label for="day7_menu">7일차 식단:</label>
+        <input type="text" id="day7_menu" name="day7_menu"><br>
 
         <input type="submit" value="Submit">
     </form>
