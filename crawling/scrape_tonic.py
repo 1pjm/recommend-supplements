@@ -84,7 +84,7 @@ import pytumblr  # 텀블러
 from requests_oauthlib import OAuth1Session
 import config
 
-keywords = ['마그네슘 영양제']  # 키워드 입력
+keywords = ['칼륨 영양제']  # 키워드 입력
 
 for keyword in keywords:
 
@@ -220,10 +220,10 @@ for keyword in keywords:
             print(coupang_short_url)  # 확인
             coupang_short_urls.append(coupang_short_url)
 
-    print("최종 숏츠링크가 최종 완료되었습니다.")  # 최종확인
+    print("최종 숏츠링크가 생성 완료되었습니다.")  # 최종확인
 
 # 엑셀 파일 저장 경로
-output_dir = 'C:/Users/samsung/Desktop/s/캡디/capstone-design-2024/crawling'
+output_dir = 'C:/Users/samsung/Desktop/s/capstone/capstone-design-2024/crawling'
 output_file = os.path.join(output_dir, 'search_results.csv')
 
 # 디렉토리가 존재하지 않으면 생성
@@ -231,7 +231,7 @@ os.makedirs(output_dir, exist_ok=True)
 
 # 파일 저장
 with open(output_file, 'w', encoding='utf-8-sig') as f:
-    f.write("keyword,product_names,product_prices,product_reviews,product_images,coupang_short_urls" + '\n')  # 컬럼명 입력
+    f.write("검색어,상품명,상품가격,상품 리뷰수,상품 이미지,판매 링크" + '\n')  # 컬럼명 입력
 
     for i in range(0, 10):
         name = product_names[i]
