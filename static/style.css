@@ -1,0 +1,99 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"], input[type="number"] {
+    width: 300px;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+input[type="text"]::placeholder, input[type="number"]::placeholder {
+    color: #999;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.day-section {
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.del-meal {
+    margin-left: 10px;
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.meal-input {
+    width: 200px;
+}
+
+.suggestions {
+    border: 1px solid #ddd;
+    max-height: 100px;
+    overflow-y: auto;
+    width: 300px;
+}
+
+.suggestions li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestions li:hover {
+    background-color: #f0f0f0;
+}
+
+.supplements {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.supplement-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    width: 45%;
+}
+
+.supplement-item img {
+    max-width: 100%;
+}
+
+.supplement-item p {
+    margin: 5px 0;
+}

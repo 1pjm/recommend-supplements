@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>식단 입력</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>7일치 식단 입력</h1>
+    <form id="dietForm" action="/day" method="POST">
+        {% for day in range(1, 8) %}
+            <div class="day-section">
+                <h2>{{ day }}일차</h2>
+                <input type="text" class="meal-input" placeholder="음식을 입력하세요" autocomplete="off" oninput="showSuggestions(event, {{ day }})">
+                <ul class="suggestions" id="suggestions-{{ day }}"></ul>
+                <button type="button" class="add-meal">추가</button>
+                <ul class="meal-list"></ul>
+            </div>
+        {% endfor %}
+        <input type="hidden" name="meals[]" id="mealsInput">
+        <button type="submit">제출</button>
+    </form>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

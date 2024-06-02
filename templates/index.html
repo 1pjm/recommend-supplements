@@ -2,63 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutrition Calculator</title>
+    <title>사용자 정보 입력</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Nutrition Calculator</h1>
-    <form action="/result" method="post">
+    <h1>사용자 정보 입력</h1>
+    <form action="/" method="POST">
         <label for="gender">성별:</label>
-        <select name="gender" id="gender">
-            <option value="남자">남자</option>
-            <option value="여자">여자</option>
-        </select><br>
-
+        <input type="text" id="gender" name="gender" placeholder="남자, 여자 중 하나로 입력" required><br>
         <label for="age">나이:</label>
-        <input type="number" id="age" name="age"><br>
-
+        <input type="number" id="age" name="age" placeholder="숫자만 입력" required><br>
         <label for="height">키 (cm):</label>
-        <input type="number" id="height" name="height"><br>
-
+        <input type="number" id="height" name="height" placeholder="숫자만 입력" required><br>
         <label for="weight">몸무게 (kg):</label>
-        <input type="number" id="weight" name="weight"><br>
-
-        <label for="pa_level">PA 지수:</label>
-        <select name="pa_level" id="pa_level">
-            <option value="1">비활동적</option>
-            <option value="2">저활동적</option>
-            <option value="3">활동적</option>
-            <option value="4">매우 활동적</option>
+        <input type="number" id="weight" name="weight" placeholder="숫자만 입력" required><br>
+        <label for="pa_level">활동 수준:</label>
+        <select id="pa_level" name="pa_level" required>
+            <option value="1">1: 비활동적</option>
+            <option value="2">2: 저활동적</option>
+            <option value="3">3: 활동적</option>
+            <option value="4">4: 매우 활동적</option>
         </select><br>
+        
+        <h3>질병 유무:</h3>
+        <label for="disease_hypertension">고혈압:</label>
+        <input type="checkbox" id="disease_hypertension" name="disease_hypertension" value="유"><br>
+        <label for="disease_diabetes">당뇨병:</label>
+        <input type="checkbox" id="disease_diabetes" name="disease_diabetes" value="유"><br>
+        <label for="disease_stomach_cancer">위암:</label>
+        <input type="checkbox" id="disease_stomach_cancer" name="disease_stomach_cancer" value="유"><br>
+        <label for="disease_colon_cancer">대장암:</label>
+        <input type="checkbox" id="disease_colon_cancer" name="disease_colon_cancer" value="유"><br>
+        <label for="disease_hyperlipidemia">고지혈증:</label>
+        <input type="checkbox" id="disease_hyperlipidemia" name="disease_hyperlipidemia" value="유"><br>
+        <label for="disease_osteoporosis">골다공증:</label>
+        <input type="checkbox" id="disease_osteoporosis" name="disease_osteoporosis" value="유"><br>
 
-        <label for="diseases">질병 유무:</label><br>
-        <input type="checkbox" id="hypertension" name="diseases" value="고혈압">
-        <label for="hypertension">고혈압</label><br>
-        <input type="checkbox" id="diabetes" name="diseases" value="당뇨병">
-        <label for="diabetes">당뇨병</label><br>
-        <input type="checkbox" id="cancer" name="diseases" value="위암과 대장암">
-        <label for="cancer">위암과 대장암</label><br>
-        <input type="checkbox" id="hyperlipidemia" name="diseases" value="고지혈증">
-        <label for="hyperlipidemia">고지혈증</label><br>
-        <input type="checkbox" id="osteoporosis" name="diseases" value="골다공증">
-        <label for="osteoporosis">골다공증</label><br>
-
-        <label for="day1_menu">1일차 식단:</label>
-        <input type="text" id="day1_menu" name="day1_menu"><br>
-        <label for="day2_menu">2일차 식단:</label>
-        <input type="text" id="day2_menu" name="day2_menu"><br>
-        <label for="day3_menu">3일차 식단:</label>
-        <input type="text" id="day3_menu" name="day3_menu"><br>
-        <label for="day4_menu">4일차 식단:</label>
-        <input type="text" id="day4_menu" name="day4_menu"><br>
-        <label for="day5_menu">5일차 식단:</label>
-        <input type="text" id="day5_menu" name="day5_menu"><br>
-        <label for="day6_menu">6일차 식단:</label>
-        <input type="text" id="day6_menu" name="day6_menu"><br>
-        <label for="day7_menu">7일차 식단:</label>
-        <input type="text" id="day7_menu" name="day7_menu"><br>
-
-        <input type="submit" value="Submit">
+        <button type="submit">제출</button>
     </form>
 </body>
 </html>

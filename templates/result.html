@@ -2,44 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nutrition Calculator Result</title>
+    <title>결과 페이지</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>결과</h1>
-    <p>BMI 지수: {{ bmi }}</p>
-    <p>PA 지수: {{ pa_index }}</p>
-    <h2>권장 섭취량</h2>
+    <h1>영양소 섭취 결과</h1>
+    <h2>영양 섭취 상태</h2>
     <ul>
-        <li>에너지: {{ requirements[0] }} kcal</li>
-        <li>탄수화물: {{ requirements[1] }} g</li>
-        <li>단백질: {{ requirements[2] }} g</li>
-        <li>지방: {{ requirements[3] }} g</li>
-        <li>칼슘: {{ requirements[4] }} mg</li>
-        <li>인: {{ requirements[5] }} mg</li>
-        <li>철: {{ requirements[6] }} mg</li>
-        <li>티아민: {{ requirements[7] }} mg</li>
-        <li>리보플라빈: {{ requirements[8] }} mg</li>
-        <li>니아신: {{ requirements[9] }} mg</li>
-        <li>비타민 C: {{ requirements[10] }} mg</li>
-    </ul>
-    <h2>하루 실제 영양소 섭취량</h2>
-    <ul>
-        {% for nutrient, value in average_nutrition_values.items() %}
-            <li>{{ nutrient }}: {{ value }} g</li>
+        {% for status in nutrition_status %}
+            <li>{{ status }}</li>
         {% endfor %}
     </ul>
-    <h2>영양소 섭취량 비교</h2>
-    <ul>
-        {% for nutrient, diff in zip(average_nutrition_values.keys(), gap) %}
-            {% if diff > 0 %}
-                <li>{{ nutrient }}을(를) {{ diff }}g 부족하게 섭취했습니다.</li>
-            {% elif diff < 0 %}
-                <li>{{ nutrient }}을(를) {{ abs(diff) }}g 과도하게 섭취했습니다.</li>
-            {% else %}
-                <li>{{ nutrient }}을(를) 적절하게 섭취했습니다.</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    <h2>추천 영양제</h2>
+    {% for keyword, products in supplements.items() %}
+        <h3>{{ keyword }}</h3>
+        <div class="supplements">
+            {% for product in products %}
+                <div class="supplement-item">
+                    <img src="{{ product[4] }}" alt="{{ product[1] }}" width="100" height="100">
+                    <p>{{ product[1] }}</p>
+                    <p>가격: {{ product[2] }}원</p>
+                    <p>리뷰 수: {{ product[3] }}</p>
+                    <a href="{{ product[5] }}" target="_blank">구매 링크</a>
+                </div>
+                {% if loop.index % 5 == 0 %}
+                    </div><div class="supplements">
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <a href="{{ url_for('download') }}">추천 영양제 파일 다운로드</a>
 </body>
 </html>
