@@ -57,32 +57,34 @@ document.addEventListener('DOMContentLoaded', function() {
             mealList.querySelectorAll('li').forEach(li => {
                 mealsForDay.push(li.firstChild.textContent);
             });
-            allMeals.push(`Day ${day + 1}: ${mealsForDay.join(', ')}`);
+            allMeals.push(mealsForDay.join(', '));
         });
-        mealsInput.value = allMeals.join(' | ');
-    }
-
-    function showSuggestions(event, day) {
-        const query = event.target.value;
-        const suggestionsBox = document.getElementById(`suggestions-${day}`);
-
-        if (query.length > 0) {
-            fetch(`/search?query=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    suggestionsBox.innerHTML = '';
-                    data.forEach(item => {
-                        const li = document.createElement('li');
-                        li.textContent = item;
-                        li.addEventListener('click', () => {
-                            event.target.value = item;
-                            suggestionsBox.innerHTML = '';
-                        });
-                        suggestionsBox.appendChild(li);
-                    });
-                });
-        } else {
-            suggestionsBox.innerHTML = '';
-        }
+        mealsInput.value = JSON.stringify(allMeals);
     }
 });
+
+function showSuggestions(event, day) {
+    const query = event.target.value;
+    const suggestionsBox = document.getElementById(`suggestions-${day}`);
+
+    if (query.length > 0) {
+        fetch(`/search?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionsBox.innerHTML = '';
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    li.addEventListener('click', () => {
+                        event.target.value = item;
+                        suggestionsBox.innerHTML = '';
+                    });
+                    suggestionsBox.appendChild(li);
+                });
+            });
+    } else {
+        suggestionsBox.innerHTML = '';
+    }
+}
+
+// 
