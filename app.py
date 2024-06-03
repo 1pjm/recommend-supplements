@@ -255,32 +255,27 @@ def index():
 @app.route('/confirm', methods=['GET', 'POST'])
 def confirm():
     if request.method == 'POST':
-        if 'edit' in request.form:
+        if 'confirm' in request.form:
+            return redirect(url_for('day'))
+        elif 'edit' in request.form:
             key = request.form['edit']
             value = request.form['value']
             if key in ['age', 'height', 'weight']:
                 session[key] = float(value) if '.' in value else int(value)
             elif key == 'pa_level':
                 session[key] = value
-            elif key in session['diseases']:
-                session['diseases'][key] = value == '유'
+            elif key == 'diseases':
+                session['diseases'] = {
+                    "고혈압": '고혈압' in value,
+                    "당뇨병": '당뇨병' in value,
+                    "위암": '위암' in value,
+                    "대장암": '대장암' in value,
+                    "고지혈증": '고지혈증' in value,
+                    "골다공증": '골다공증' in value
+                }
             else:
                 session[key] = value
-        else:
-            session['diseases'] = {
-                "고혈압": request.form.get('disease_hypertension') == '유',
-                "당뇨병": request.form.get('disease_diabetes') == '유',
-                "위암": request.form.get('disease_stomach_cancer') == '유',
-                "대장암": request.form.get('disease_colon_cancer') == '유',
-                "고지혈증": request.form.get('disease_hyperlipidemia') == '유',
-                "골다공증": request.form.get('disease_osteoporosis') == '유'
-            }
-            session['gender'] = request.form.get('gender')
-            session['age'] = float(request.form.get('age')) if '.' in request.form.get('age') else int(request.form.get('age'))
-            session['height'] = float(request.form.get('height'))
-            session['weight'] = float(request.form.get('weight'))
-            session['pa_level'] = request.form.get('pa_level')
-            return redirect(url_for('day'))
+            return redirect(url_for('confirm'))
     return render_template('confirm.html', data=session)
 
 @app.route('/day', methods=['GET', 'POST'])
