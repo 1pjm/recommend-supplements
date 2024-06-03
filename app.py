@@ -295,7 +295,7 @@ def day():
 def search():
     query = request.args.get('query', '')
     if query:
-        results = combined_nutrition_data[combined_nutrition_data['식품명'].str.startswith(query)]
+        results = combined_nutrition_data[combined_nutrition_data['식품명'].str.contains(query)]
         suggestions = results['식품명'].tolist()
     else:
         suggestions = []

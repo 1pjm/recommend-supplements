@@ -51,9 +51,6 @@
 
         function saveEdit(id) {
             var element = document.getElementById(id);
-            var button = document.getElementById(id + '_btn');
-            var cancel = document.getElementById(id + '_cancel');
-            var save = document.getElementById(id + '_save');
             var value = element.value;
 
             if (id === 'diseases') {
@@ -125,18 +122,18 @@
         <br>
 
         <label for="diseases">질병 유무:</label><br>
-        <input type="checkbox" id="고혈압" name="disease" {% if data['diseases']['고혈압'] %}checked{% endif %} disabled> 고혈압<br>
-        <input type="checkbox" id="당뇨병" name="disease" {% if data['diseases']['당뇨병'] %}checked{% endif %} disabled> 당뇨병<br>
-        <input type="checkbox" id="위암" name="disease" {% if data['diseases']['위암'] %}checked{% endif %} disabled> 위암<br>
-        <input type="checkbox" id="대장암" name="disease" {% if data['diseases']['대장암'] %}checked{% endif %} disabled> 대장암<br>
-        <input type="checkbox" id="고지혈증" name="disease" {% if data['diseases']['고지혈증'] %}checked{% endif %} disabled> 고지혈증<br>
-        <input type="checkbox" id="골다공증" name="disease" {% if data['diseases']['골다공증'] %}checked{% endif %} disabled> 골다공증<br>
+        <input type="checkbox" id="고혈압" name="disease" value="고혈압" {% if data['diseases']['고혈압'] %}checked{% endif %} disabled> 고혈압<br>
+        <input type="checkbox" id="당뇨병" name="disease" value="당뇨병" {% if data['diseases']['당뇨병'] %}checked{% endif %} disabled> 당뇨병<br>
+        <input type="checkbox" id="위암" name="disease" value="위암" {% if data['diseases']['위암'] %}checked{% endif %} disabled> 위암<br>
+        <input type="checkbox" id="대장암" name="disease" value="대장암" {% if data['diseases']['대장암'] %}checked{% endif %} disabled> 대장암<br>
+        <input type="checkbox" id="고지혈증" name="disease" value="고지혈증" {% if data['diseases']['고지혈증'] %}checked{% endif %} disabled> 고지혈증<br>
+        <input type="checkbox" id="골다공증" name="disease" value="골다공증" {% if data['diseases']['골다공증'] %}checked{% endif %} disabled> 골다공증<br>
         <button type="button" id="diseases_btn" onclick="enableEdit('diseases')">수정</button>
-        <button type="button" id="diseases_cancel" onclick="cancelEdit('diseases', '{{ data["diseases"] | selectattr("value") | map('id') | list }}')" style="display:none;">취소</button>
+        <button type="button" id="diseases_cancel" onclick="cancelEdit('diseases', ['{{ data["diseases"]["고혈압"] }}', '{{ data["diseases"]["당뇨병"] }}', '{{ data["diseases"]["위암"] }}', '{{ data["diseases"]["대장암"] }}', '{{ data["diseases"]["고지혈증"] }}', '{{ data["diseases"]["골다공증"] }}'])" style="display:none;">취소</button>
         <button type="button" id="diseases_save" onclick="saveEdit('diseases')" style="display:none;">완료</button>
         <br>
 
-        <button type="submit">확인</button>
+        <button type="submit" name="confirm">확인</button>
     </form>
 </body>
 </html>

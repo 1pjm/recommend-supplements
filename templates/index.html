@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>사용자 정보 입력</h1>
-    <form action="/" method="POST">
+    <form action="{{ url_for('index') }}" method="POST">
         <label for="gender">성별:</label>
         <input type="text" id="gender" name="gender" placeholder="남자, 여자 중 하나로 입력" required><br>
         <label for="age">나이:</label>
