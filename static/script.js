@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 addMeal(mealInput, mealList);
             }
         });
+
+        mealInput.addEventListener('input', (event) => {
+            showSuggestions(event, index + 1);
+        });
     });
 
     dietForm.addEventListener('submit', () => {
@@ -57,28 +61,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         mealsInput.value = allMeals.join(' | ');
     }
-});
 
-function showSuggestions(event, day) {
-    const query = event.target.value;
-    const suggestionsBox = document.getElementById(`suggestions-${day}`);
+    function showSuggestions(event, day) {
+        const query = event.target.value;
+        const suggestionsBox = document.getElementById(`suggestions-${day}`);
 
-    if (query.length > 0) {
-        fetch(`/search?query=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                suggestionsBox.innerHTML = '';
-                data.forEach(item => {
-                    const li = document.createElement('li');
-                    li.textContent = item;
-                    li.addEventListener('click', () => {
-                        event.target.value = item;
-                        suggestionsBox.innerHTML = '';
+        if (query.length > 0) {
+            fetch(`/search?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    suggestionsBox.innerHTML = '';
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        li.addEventListener('click', () => {
+                            event.target.value = item;
+                            suggestionsBox.innerHTML = '';
+                        });
+                        suggestionsBox.appendChild(li);
                     });
-                    suggestionsBox.appendChild(li);
                 });
-            });
-    } else {
-        suggestionsBox.innerHTML = '';
+        } else {
+            suggestionsBox.innerHTML = '';
+        }
     }
-}
+});
