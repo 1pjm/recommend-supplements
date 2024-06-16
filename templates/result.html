@@ -2,36 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>결과 페이지</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>영양소 섭취 결과</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .supplement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .supplement img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .supplement-details {
+            flex: 1;
+        }
+        .supplement-details p {
+            margin: 5px 0;
+        }
+        .buy-link {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .buy-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>영양소 섭취 결과</h1>
-    <h2>영양 섭취 상태</h2>
-    <ul>
-        {% for status in nutrition_status %}
-            <li>{{ status }}</li>
-        {% endfor %}
-    </ul>
-    <h2>추천 영양제</h2>
-    {% for keyword, products in supplements.items() %}
-        <h3>{{ keyword }}</h3>
-        <div class="supplements">
-            {% for product in products %}
-                <div class="supplement-item">
-                    <img src="{{ product[4] }}" alt="{{ product[1] }}" width="100" height="100">
-                    <p>{{ product[1] }}</p>
-                    <p>가격: {{ product[2] }}원</p>
-                    <p>리뷰 수: {{ product[3] }}</p>
-                    <a href="{{ product[5] }}" target="_blank">구매 링크</a>
-                </div>
-                {% if loop.index % 5 == 0 %}
-                    </div><div class="supplements">
-                {% endif %}
+    <div class="container">
+        <h1>영양소 섭취 결과</h1>
+        <h2>영양 섭취 상태</h2>
+        <ul>
+            {% for status in nutrition_status %}
+                <li>{{ status }}</li>
             {% endfor %}
-        </div>
-    {% endfor %}
-    <a href="{{ url_for('download') }}">추천 영양제 파일 다운로드</a>
+        </ul>
+        <h2>추천 영양제</h2>
+        <ul>
+            {% for nutrient, supplements in supplements.items() %}
+                <li>
+                    <h3>{{ nutrient }} ({{ supplements|length }}개 추천)</h3>
+                    <ul>
+                        {% for supplement in supplements %}
+                            <li class="supplement">
+                                <img src="http://{{ supplement[4] }}" alt="Image">
+                                <div class="supplement-details">
+                                    <p><strong>{{ supplement[1] }}</strong></p>
+                                    <p>가격: {{ supplement[2] }}원</p>
+                                    <p>리뷰 수: {{ supplement[3] }}</p>
+                                    <a href="{{ supplement[5] }}" target="_blank" class="buy-link">구매 링크</a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
-<!--  -->
+
+<!--결과 페이지에서도 각 영양소가 올바르게 계산되었는지 확인합니다.-->

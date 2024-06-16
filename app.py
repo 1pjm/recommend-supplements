@@ -5,29 +5,59 @@ import csv
 import requests
 from bs4 import BeautifulSoup
 import re
+import json
+import aiohttp # 프로세스 속도 빨라짐
+import asyncio
+from flask_caching import Cache #F flask-cashing 을 사용 속도 빨라짐
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# 엑셀 파일에서 식품 영양 정보를 불러오는 함수
-def load_nutrition_data(file_path):
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
+cache.init_app(app)
+
+@cache.cached(timeout=3600, key_prefix='nutrition_data')
+def load_nutrition_data(file_path, weight_column):
     if not os.path.exists(file_path):
         print(f"파일이 존재하지 않습니다: {file_path}")
         return None
-    return pd.read_excel(file_path)
 
-# 엑셀 파일에서 식품 영양 정보를 불러오기
+    data = pd.read_excel(file_path, dtype={weight_column: str})
+
+    def convert_weight(value):
+        value_str = str(value).strip().lower()
+        try:
+            if 'g' in value_str:
+                return float(value_str.replace('g', '').strip())
+            elif 'kg' in value_str:
+                return float(value_str.replace('kg', '').strip()) * 1000
+            elif 'ml' in value_str or 'm' in value_str:
+                return float(value_str.replace('ml', '').replace('m', '').strip())
+            else:
+                return float(value_str)
+        except ValueError as e:
+            print(f"Error converting value {value_str}: {e}")
+            return float('nan')
+
+    data['식품중량'] = data[weight_column].apply(convert_weight)
+    
+    for i, row in data.iterrows():
+        if pd.isnull(row['식품중량']):
+            print(f"Invalid weight value found at index {i}: {row['식품중량']} from original value {row[weight_column]}")
+
+    return data
+
 file_path = 'data/식품영양성분DB_음식_20240416.xlsx'
-nutrition_data = load_nutrition_data(file_path)
+nutrition_data = load_nutrition_data(file_path, '식품중량')
+
 additional_file_path = 'data/식품영양성분DB_가공식품_20240416.xlsx'
-additional_nutrition_data = load_nutrition_data(additional_file_path)
+additional_nutrition_data = load_nutrition_data(additional_file_path, '식품중량')
+
 combined_nutrition_data = pd.concat([nutrition_data, additional_nutrition_data], ignore_index=True)
 
-# BMI 지수 계산 함수
 def calculate_bmi(weight, height):
     return weight / ((height / 100) ** 2)
 
-# PA 지수 계산 함수
 def calculate_pa_index(gender, pa_level):
     if gender == "여자":
         return [1.0, 1.12, 1.27, 1.45][int(pa_level)-1]
@@ -35,7 +65,6 @@ def calculate_pa_index(gender, pa_level):
         return [1.0, 1.11, 1.25, 1.48][int(pa_level)-1]
     return None
 
-# 권장 섭취량 계산 함수
 def calculate_average_requirements(gender, age, pa_index, weight, height, diseases):
     print(f"Calculating requirements for: Gender={gender}, Age={age}, PA Index={pa_index}, Weight={weight}, Height={height}, Diseases={diseases}")
     
@@ -130,7 +159,7 @@ def calculate_average_requirements(gender, age, pa_index, weight, height, diseas
                 calcium, iron, potassium = 600, 7, 2300
                 vitamin_a, thiamine, niacin = 300, 0.5, 7
                 vitamin_c, vitamin_d, magnesium = 45, 5, 110
-                vitamin_b9, vitamin_b12 = 180, 1.1
+                vitamin_b9, vitamin_b12 = 180, 1.1  
             elif 6 <= age <= 8:
                 calcium, iron, potassium = 700, 9, 2600
                 vitamin_a, thiamine, niacin = 400, 0.7, 9
@@ -142,44 +171,44 @@ def calculate_average_requirements(gender, age, pa_index, weight, height, diseas
                 vitamin_c, vitamin_d, magnesium = 70, 5, 220
                 vitamin_b9, vitamin_b12 = 300, 1.7
             elif 12 <= age <= 14:
-                calcium, iron, potassium = 900, 16, 3500
-                vitamin_a, thiamine, niacin = 650, 1.1, 15
-                vitamin_c, vitamin_d, magnesium = 90, 10, 290
+                calcium, iron, potassium = 1000, 14, 3500
+                vitamin_a, thiamine, niacin = 750, 1.1, 15
+                vitamin_c, vitamin_d, magnesium = 90, 10, 320
                 vitamin_b9, vitamin_b12 = 360, 2.3
             elif 15 <= age <= 18:
-                calcium, iron, potassium = 800, 14, 3500
-                vitamin_a, thiamine, niacin = 650, 1.2, 14
-                vitamin_c, vitamin_d, magnesium = 100, 10, 340
+                calcium, iron, potassium = 900, 14, 3500
+                vitamin_a, thiamine, niacin = 850, 1.3, 17
+                vitamin_c, vitamin_d, magnesium = 100, 10, 400
                 vitamin_b9, vitamin_b12 = 400, 2.4
             elif 19 <= age <= 29:
-                calcium, iron, potassium = 700, 14, 3500
-                vitamin_a, thiamine, niacin = 650, 1.1, 14
-                vitamin_c, vitamin_d, magnesium = 100, 10, 280
+                calcium, iron, potassium = 800, 10, 3500
+                vitamin_a, thiamine, niacin = 800, 1.2, 16
+                vitamin_c, vitamin_d, magnesium = 100, 10, 350
                 vitamin_b9, vitamin_b12 = 400, 2.4
             elif 30 <= age <= 49:
-                calcium, iron, potassium = 700, 14, 3500
-                vitamin_a, thiamine, niacin = 650, 1.1, 14
-                vitamin_c, vitamin_d, magnesium = 100, 10, 280
+                calcium, iron, potassium = 800, 10, 3500
+                vitamin_a, thiamine, niacin = 800, 1.2, 16
+                vitamin_c, vitamin_d, magnesium = 100, 10, 370
                 vitamin_b9, vitamin_b12 = 400, 2.4
             elif 50 <= age <= 64:
-                calcium, iron, potassium = 800, 8, 3500
-                vitamin_a, thiamine, niacin = 600, 1.1, 14
-                vitamin_c, vitamin_d, magnesium = 100, 10, 280
+                calcium, iron, potassium = 750, 10, 3500
+                vitamin_a, thiamine, niacin = 750, 1.2, 16
+                vitamin_c, vitamin_d, magnesium = 100, 10, 370
                 vitamin_b9, vitamin_b12 = 400, 2.4
             elif 65 <= age <= 74:
-                calcium, iron, potassium = 800, 8, 3500
-                vitamin_a, thiamine, niacin = 600, 1.1, 13
-                vitamin_c, vitamin_d, magnesium = 100, 15, 280
+                calcium, iron, potassium = 700, 9, 3500
+                vitamin_a, thiamine, niacin = 700, 1.2, 14
+                vitamin_c, vitamin_d, magnesium = 100, 15, 370
                 vitamin_b9, vitamin_b12 = 400, 2.4
             elif 75 <= age:
-                calcium, iron, potassium = 800, 8, 3500
-                vitamin_a, thiamine, niacin = 600, 1.1, 12
-                vitamin_c, vitamin_d, magnesium = 100, 15, 280
+                calcium, iron, potassium = 700, 9, 3500
+                vitamin_a, thiamine, niacin = 700, 1.2, 13
+                vitamin_c, vitamin_d, magnesium = 100, 15, 370
                 vitamin_b9, vitamin_b12 = 400, 2.4
             else:
                 print("Age out of range for recommendations")
                 return None
-
+    
         # 질병에 따른 조정
         if diseases["고혈압"]:
             if age >= 19:
@@ -202,7 +231,7 @@ def calculate_average_requirements(gender, age, pa_index, weight, height, diseas
     except Exception as e:
         print(f"Error in calculate_average_requirements: {e}")
         return None
-
+    
 def calculate_actual_intake(meals, combined_nutrition_data):
     nutrition_totals = {
         '에너지(kcal)': 0, '단백질(g)': 0, '지방(g)': 0, '탄수화물(g)': 0,
@@ -211,20 +240,38 @@ def calculate_actual_intake(meals, combined_nutrition_data):
         '마그네슘(㎎)': 0, '비타민 B9(μg)': 0, '비타민 B12(μg)': 0
     }
 
+    if isinstance(meals, str):
+        try:
+            meals = json.loads(meals.replace("'", '"'))
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
+            return list(nutrition_totals.values())
+
+    print(f"Calculating actual intake for meals: {meals}")
+
     for meal in meals:
         try:
-            food, quantity = meal.split('_')
-            quantity = float(quantity)
-            food_info = combined_nutrition_data[combined_nutrition_data['식품명'] == food]
+            if isinstance(meal, dict) and 'food' in meal and 'portion' in meal:
+                food = meal['food']
+                portion = int(meal['portion'])
+            else:
+                print(f"식단 항목 형식이 잘못되었습니다: {meal}")
+                continue
+
+            food_info = combined_nutrition_data[combined_nutrition_data['식품명'].str.strip() == food.strip()]
             if not food_info.empty:
+                weight = float(food_info['식품중량'].iloc[0]) if pd.notnull(food_info['식품중량'].iloc[0]) else 0
+                quantity = weight * portion
                 for nutrient in nutrition_totals.keys():
                     if nutrient in food_info.columns:
                         nutrient_value = food_info[nutrient].iloc[0]
-                        if isinstance(nutrient_value, str):
-                            nutrient_value = pd.to_numeric(nutrient_value, errors='coerce')
-                        if pd.notnull(nutrient_value):
-                            adjusted_value = nutrient_value * (quantity / 100)
-                            nutrition_totals[nutrient] += adjusted_value
+                        if pd.isnull(nutrient_value):
+                            nutrient_value = 0
+                        adjusted_value = nutrient_value * (quantity / 100)
+                        nutrition_totals[nutrient] += adjusted_value
+                        print(f"Updated {nutrient}: {nutrition_totals[nutrient]}")
+            else:
+                print(f"식품명을 찾을 수 없습니다: {food}")
         except ValueError:
             print(f"식단 항목 형식이 잘못되었습니다: {meal}")
 
@@ -232,6 +279,13 @@ def calculate_actual_intake(meals, combined_nutrition_data):
 
 def calculate_gap(nutrients, recommended_intake, actual_intake):
     return [recommended - actual for recommended, actual in zip(recommended_intake, actual_intake)]
+
+# 곱하기 인분수 * 식품중량 관련 계산
+# adjusted_value = nutrient_value * (quantity / 100) # 실제 섭취량 조정. 이 부분을 하은이랑 이야기했던 부분. 
+# nutrient_value: 각 영양소에 대한 1인분당 값 (예: 에너지 200 kcal)
+# quantity는 사용자가 입력하는 것이 아니라, 음식 정보(예: 꽁치조림)의 영양성분을 100g 기준으로 계산하는 것과 연관 
+# adjusted_value = nutrient_value * (quantity / 100) 식으로 하니, 실제 섭취량 오류 부분이 계속 되어서 챗gpt 가 말하는대로
+# adjusted_value = nutrient_value * portion * (weight / 100)로 변경해서 해보겠음. 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -281,8 +335,9 @@ def confirm():
 @app.route('/day', methods=['GET', 'POST'])
 def day():
     if request.method == 'POST':
-        meals = request.form.getlist('meals[]')
-        session['meals'] = meals
+        meals = request.form.get('meals')
+        print(f"Received meals: {meals}")  # 입력 데이터 확인을 위한 로그
+        session['meals'] = json.loads(meals)  # JSON 문자열을 리스트로 변환하여 세션에 저장
         return redirect(url_for('result'))
     return render_template('day.html')
 
@@ -296,29 +351,44 @@ def search():
         suggestions = []
     return jsonify(suggestions)
 
-def coupang_search(keyword):
+@app.route('/save_meals', methods=['POST'])
+def save_meals():
+    meals = request.json
+    session['meals'] = meals  # 세션에 저장
+    with open('meals.json', 'w', encoding='utf-8') as f:
+        json.dump(meals, f, ensure_ascii=False, indent=4)
+    return '', 204
+
+async def fetch_product(session, keyword):
     target_url = f'https://www.coupang.com/np/search?component=&q={keyword}&channel=user'
     headers = {
         'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,zh-TW;q=0.6,zh;q=0.5',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36',
         'Accept-Encoding': 'gzip'
     }
-    res = requests.get(url=target_url, headers=headers)
-    soup = BeautifulSoup(res.text, "html.parser")
+    async with session.get(url=target_url, headers=headers) as response:
+        res = await response.text()
+        soup = BeautifulSoup(res, "html.parser")
 
-    products = soup.select('li.search-product')
-    results = []
+        products = soup.select('li.search-product')
+        results = []
 
-    for product in products[:10]:
-        name = product.select_one('div > div.name').text.strip()
-        price = product.select_one('div.price-wrap > div.price > em > strong').text.strip().replace(",", "")
-        review = product.select_one('div.other-info > div > span.rating-total-count')
-        review = re.sub("[()]", "", review.text.strip()) if review else '0'
-        link = "https://www.coupang.com" + product.select_one('a.search-product-link')['href'].strip()
-        image = product.select_one('dt > img').get('data-img-src') or product.select_one('dt > img').get('src').replace("//", "")
-        
-        results.append([keyword, name, price, review, image, link])
+        for product in products[:5]:
+            name = product.select_one('div > div.name').text.strip()
+            price = product.select_one('div.price-wrap > div.price > em > strong').text.strip().replace(",", "")
+            review = product.select_one('div.other-info > div > span.rating-total-count')
+            review = re.sub("[()]", "", review.text.strip()) if review else '0'
+            link = "https://www.coupang.com" + product.select_one('a.search-product-link')['href'].strip()
+            image = product.select_one('dt > img').get('data-img-src') or product.select_one('dt > img').get('src').replace("//", "")
+            
+            results.append([keyword, name, price, review, image, link])
 
+        return results
+
+async def coupang_search_async(keywords):
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_product(session, keyword) for keyword in keywords]
+        results = await asyncio.gather(*tasks)
     return results
 
 @app.route('/result')
@@ -331,30 +401,24 @@ def result():
     diseases = session.get('diseases')
     meals = session.get('meals')
 
-    print("Gender:", gender)
-    print("Age:", age)
-    print("Height:", height)
-    print("Weight:", weight)
-    print("PA Level:", pa_level)
-    print("Diseases:", diseases)
-    print("Meals:", meals)
+    if not meals:
+        return "식단 데이터를 찾을 수 없습니다.", 400
 
     bmi = calculate_bmi(weight, height)
     pa_index = calculate_pa_index(gender, pa_level)
-    print("BMI:", bmi)
-    print("PA Index:", pa_index)
 
     recommended_intake = calculate_average_requirements(gender, age, pa_index, weight, height, diseases)
-    print("Recommended Intake:", recommended_intake)
-
     if recommended_intake is None:
         return "추천 섭취량을 계산할 수 없습니다. 입력 값을 확인해주세요.", 400
 
     actual_intake = calculate_actual_intake(meals, combined_nutrition_data)
+
+    print("Recommended Intake:", recommended_intake)
     print("Actual Intake:", actual_intake)
 
     nutrients = ['에너지(kcal)', '단백질(g)', '지방(g)', '탄수화물(g)', '칼슘(mg)', '철(mg)', '칼륨(mg)', '비타민 A(μg RAE)', '티아민(mg)', '니아신(mg)', '비타민 C(mg)', '비타민 D(μg)', '마그네슘(㎎)', '비타민 B9(μg)', '비타민 B12(μg)']
     gap = calculate_gap(nutrients, recommended_intake, actual_intake)
+
     print("Gap:", gap)
 
     keywords = {
@@ -372,28 +436,30 @@ def result():
         '비타민 B12(μg)': '비타민 B12 보충제'
     }
 
+    # 상위 3개의 부족한 영양소만 추출
+    top_3_gap = sorted(zip(nutrients, gap), key=lambda x: x[1], reverse=True)[:3]
+    top_3_keywords = [keywords[nutrient] for nutrient, diff in top_3_gap if diff > 0]
     supplements = {}
-    for nutrient, keyword in keywords.items():
-        supplements[nutrient] = coupang_search(keyword)
+
+    if top_3_keywords:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        search_results = loop.run_until_complete(coupang_search_async(top_3_keywords))
+        loop.close()
+
+        for nutrient, result in zip(top_3_gap, search_results):
+            nutrient_name, diff = nutrient
+            if diff > 0:
+                supplements[nutrient_name] = result
 
     nutrition_status = []
-    for nutrient, diff in zip(nutrients, gap):
+    for nutrient, diff in top_3_gap:
         if diff > 0:
-            status = f"{nutrient}을(를) {diff:.2f} 부족하게 섭취했습니다. 고로 {nutrient}와 관련된 영양제 TOP10을 추천해드리겠습니다."
-        elif diff < 0:
-            status = f"{nutrient}을(를) {abs(diff):.2f} 과도하게 섭취했습니다."
-        else:
-            status = f"{nutrient}을(를) 적절하게 섭취했습니다."
-        nutrition_status.append(status)
+            status = f"{nutrient}을(를) {diff:.2f} 부족하게 섭취했습니다. 고로 {nutrient}와 관련된 영양제(TOP 5)를 추천해드리겠습니다."
+            nutrition_status.append(status)
 
-    return render_template('result.html', nutrition_status=nutrition_status, supplements=supplements)
-
-
-@app.route('/download')
-def download():
-    path = 'search_results.csv'
-    return send_file(path, as_attachment=True)
+    return render_template('result.html', nutrition_status=nutrition_status, supplements=supplements, recommended_intake=recommended_intake, actual_intake=actual_intake, gap=gap)
 
 if __name__ == '__main__':
+    print("Combined nutrition data loaded successfully")
     app.run(debug=True)
-# 

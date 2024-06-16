@@ -6,43 +6,28 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
         function enableEdit(id) {
-            var element = document.getElementById(id);
             var button = document.getElementById(id + '_btn');
             var cancel = document.getElementById(id + '_cancel');
             var save = document.getElementById(id + '_save');
 
-            if (id === 'pa_level' || id === 'gender') {
-                element.disabled = false;
-            } else if (id === 'diseases') {
+            if (id === 'diseases') {
                 document.querySelectorAll('[name="disease"]').forEach(e => e.disabled = false);
-            } else {
-                element.readOnly = false;
             }
-            element.style.borderColor = "black";
             button.style.display = 'none';
             cancel.style.display = 'inline-block';
             save.style.display = 'inline-block';
         }
 
-        function cancelEdit(id, originalValue) {
-            var element = document.getElementById(id);
+        function cancelEdit(id, originalValues) {
             var button = document.getElementById(id + '_btn');
             var cancel = document.getElementById(id + '_cancel');
             var save = document.getElementById(id + '_save');
 
-            if (id === 'pa_level' || id === 'gender') {
-                element.disabled = true;
-            } else if (id === 'diseases') {
+            if (id === 'diseases') {
                 document.querySelectorAll('[name="disease"]').forEach(e => {
                     e.disabled = true;
-                    e.checked = originalValue.includes(e.id);
+                    e.checked = originalValues.includes(e.value); 
                 });
-            } else {
-                element.readOnly = true;
-            }
-            element.style.borderColor = "lightgray";
-            if (id !== 'diseases') {
-                element.value = originalValue;
             }
             button.style.display = 'inline-block';
             cancel.style.display = 'none';
@@ -50,11 +35,10 @@
         }
 
         function saveEdit(id) {
-            var element = document.getElementById(id);
-            var value = element.value;
+            var value;
 
             if (id === 'diseases') {
-                value = Array.from(document.querySelectorAll('[name="disease"]:checked')).map(e => e.id);
+                value = Array.from(document.querySelectorAll('[name="disease"]:checked')).map(e => e.value);
             }
 
             var form = document.getElementById('editForm');
@@ -66,7 +50,7 @@
             var valueField = document.createElement('input');
             valueField.type = 'hidden';
             valueField.name = 'value';
-            valueField.value = value;
+            valueField.value = JSON.stringify(value);
 
             form.appendChild(hiddenField);
             form.appendChild(valueField);
@@ -83,30 +67,18 @@
             <option value="남자" {% if data['gender'] == '남자' %}selected{% endif %}>남자</option>
             <option value="여자" {% if data['gender'] == '여자' %}selected{% endif %}>여자</option>
         </select>
-        <button type="button" id="gender_btn" onclick="enableEdit('gender')">수정</button>
-        <button type="button" id="gender_cancel" onclick="cancelEdit('gender', '{{ data['gender'] }}')" style="display:none;">취소</button>
-        <button type="button" id="gender_save" onclick="saveEdit('gender')" style="display:none;">완료</button>
         <br>
 
         <label for="age">나이:</label>
         <input type="text" id="age" name="age" value="{{ data['age'] }}" readonly>
-        <button type="button" id="age_btn" onclick="enableEdit('age')">수정</button>
-        <button type="button" id="age_cancel" onclick="cancelEdit('age', '{{ data['age'] }}')" style="display:none;">취소</button>
-        <button type="button" id="age_save" onclick="saveEdit('age')" style="display:none;">완료</button>
         <br>
 
         <label for="height">키 (cm):</label>
         <input type="text" id="height" name="height" value="{{ data['height'] }}" readonly>
-        <button type="button" id="height_btn" onclick="enableEdit('height')">수정</button>
-        <button type="button" id="height_cancel" onclick="cancelEdit('height', '{{ data['height'] }}')" style="display:none;">취소</button>
-        <button type="button" id="height_save" onclick="saveEdit('height')" style="display:none;">완료</button>
         <br>
 
         <label for="weight">몸무게 (kg):</label>
         <input type="text" id="weight" name="weight" value="{{ data['weight'] }}" readonly>
-        <button type="button" id="weight_btn" onclick="enableEdit('weight')">수정</button>
-        <button type="button" id="weight_cancel" onclick="cancelEdit('weight', '{{ data['weight'] }}')" style="display:none;">취소</button>
-        <button type="button" id="weight_save" onclick="saveEdit('weight')" style="display:none;">완료</button>
         <br>
 
         <label for="pa_level">활동 수준:</label>
@@ -116,9 +88,6 @@
             <option value="3" {% if data['pa_level'] == "3" %}selected{% endif %}>3: 활동적</option>
             <option value="4" {% if data['pa_level'] == "4" %}selected{% endif %}>4: 매우 활동적</option>
         </select>
-        <button type="button" id="pa_level_btn" onclick="enableEdit('pa_level')">수정</button>
-        <button type="button" id="pa_level_cancel" onclick="cancelEdit('pa_level', '{{ data['pa_level'] }}')" style="display:none;">취소</button>
-        <button type="button" id="pa_level_save" onclick="saveEdit('pa_level')" style="display:none;">완료</button>
         <br>
 
         <label for="diseases">질병 유무:</label><br>
@@ -129,7 +98,7 @@
         <input type="checkbox" id="고지혈증" name="disease" value="고지혈증" {% if data['diseases']['고지혈증'] %}checked{% endif %} disabled> 고지혈증<br>
         <input type="checkbox" id="골다공증" name="disease" value="골다공증" {% if data['diseases']['골다공증'] %}checked{% endif %} disabled> 골다공증<br>
         <button type="button" id="diseases_btn" onclick="enableEdit('diseases')">수정</button>
-        <button type="button" id="diseases_cancel" onclick="cancelEdit('diseases', ['{{ data["diseases"]["고혈압"] }}', '{{ data["diseases"]["당뇨병"] }}', '{{ data["diseases"]["위암"] }}', '{{ data["diseases"]["대장암"] }}', '{{ data["diseases"]["고지혈증"] }}', '{{ data["diseases"]["골다공증"] }}'])" style="display:none;">취소</button>
+        <button type="button" id="diseases_cancel" onclick="cancelEdit('diseases', ['{% if data["diseases"]["고혈압"] %}고혈압{% endif %}', '{% if data["diseases"]["당뇨병"] %}당뇨병{% endif %}', '{% if data["diseases"]["위암"] %}위암{% endif %}', '{% if data["diseases"]["대장암"] %}대장암{% endif %}', '{% if data["diseases"]["고지혈증"] %}고지혈증{% endif %}', '{% if data["diseases"]["골다공증"] %}골다공증{% endif %}'])" style="display:none;">취소</button>
         <button type="button" id="diseases_save" onclick="saveEdit('diseases')" style="display:none;">완료</button>
         <br>
 

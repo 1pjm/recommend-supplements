@@ -2,8 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>식단 입력</title>
+    <title>7일치 식단 입력</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .autocomplete-suggestions {
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+            background: white;
+            position: absolute;
+            z-index: 9999;
+        }
+        .autocomplete-suggestion {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestion:hover {
+            background: #eee;
+        }
+        .delete-meal {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <h1>7일치 식단 입력</h1>
@@ -11,16 +35,113 @@
         {% for day in range(1, 8) %}
             <div class="day-section">
                 <h2>{{ day }}일차</h2>
-                <input type="text" class="meal-input" placeholder="음식을 입력하세요" autocomplete="off" oninput="showSuggestions(event, {{ day }})">
-                <ul class="suggestions" id="suggestions-{{ day }}"></ul>
-                <button type="button" class="add-meal">추가</button>
-                <ul class="meal-list"></ul>
+                <input type="text" class="meal-input" id="meal-input-{{ day }}" placeholder="음식을 입력하세요" autocomplete="off">
+                <div class="autocomplete-suggestions" id="suggestions-{{ day }}"></div>
+                <select class="portion-input" id="portion-input-{{ day }}">
+                    <option value="1">1인분</option>
+                    <option value="2">2인분</option>
+                    <option value="3">3인분</option>
+                    <option value="4">4인분</option>
+                    <option value="5">5인분</option>
+                </select>
+                <button type="button" class="add-meal" data-day="{{ day }}">추가</button>
+                <ul class="meal-list" id="meal-list-{{ day }}"></ul>
             </div>
         {% endfor %}
-        <input type="hidden" name="meals[]" id="mealsInput">
+        <input type="hidden" name="meals" id="mealsInput">
         <button type="submit">제출</button>
     </form>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.querySelectorAll('.meal-input').forEach((input) => {
+            input.addEventListener('input', () => {
+                const day = input.id.split('-')[2];
+                const query = input.value;
+                const suggestionsContainer = document.getElementById(`suggestions-${day}`);
+                if (query.trim() === '') {
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+                fetch(`/search?query=${query}`)
+                    .then(response => response.json())
+                    .then(suggestions => {
+                        suggestionsContainer.innerHTML = '';
+                        suggestions.forEach(suggestion => {
+                            const suggestionItem = document.createElement('div');
+                            suggestionItem.classList.add('autocomplete-suggestion');
+                            suggestionItem.textContent = suggestion;
+                            suggestionItem.addEventListener('click', () => {
+                                input.value = suggestion;
+                                suggestionsContainer.innerHTML = '';
+                            });
+                            suggestionsContainer.appendChild(suggestionItem);
+                        });
+                    });
+            });
+        });
+
+        document.querySelectorAll('.add-meal').forEach((button) => {
+            button.addEventListener('click', () => {
+                const day = button.getAttribute('data-day');
+                const mealInput = document.getElementById(`meal-input-${day}`).value.trim();
+                const portionInput = document.getElementById(`portion-input-${day}`).value;
+                const mealList = document.getElementById(`meal-list-${day}`);
+
+                if (mealInput === '') {
+                    alert('음식 이름을 입력하세요.');
+                    return;
+                }
+
+                // Check for duplicates
+                let isDuplicate = false;
+                document.querySelectorAll(`#meal-list-${day} li`).forEach((item) => {
+                    if (item.querySelector('.meal-text').textContent === mealInput) {
+                        isDuplicate = true;
+                    }
+                });
+
+                // Only add if not duplicate
+                if (!isDuplicate) {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `<span class="meal-text">${mealInput}</span> <button type="button" class="delete-meal">삭제</button>`;
+                    mealList.appendChild(listItem);
+
+                    // Add meal to hidden input
+                    const mealsInput = document.getElementById('mealsInput');
+                    const meals = mealsInput.value ? JSON.parse(mealsInput.value) : [];
+                    meals.push({food: mealInput, portion: portionInput});
+                    mealsInput.value = JSON.stringify(meals);
+
+                    // Add delete button functionality
+                    listItem.querySelector('.delete-meal').addEventListener('click', () => {
+                        mealList.removeChild(listItem);
+                        const updatedMeals = JSON.parse(mealsInput.value).filter(m => m.food !== mealInput);
+                        mealsInput.value = JSON.stringify(updatedMeals);
+                    });
+
+                    // Clear the input fields
+                    document.getElementById(`meal-input-${day}`).value = '';
+                    document.getElementById(`suggestions-${day}`).innerHTML = '';
+                }
+            });
+        });
+
+        // Convert meals list to JSON string before submitting
+        document.getElementById('dietForm').addEventListener('submit', (event) => {
+            const mealsInput = document.getElementById('mealsInput');
+            if (mealsInput.value) {
+                // Ensure the value is already a JSON string
+                mealsInput.value = mealsInput.value;
+            }
+        });
+    </script>
 </body>
 </html>
-<!--  -->
+
+
+
+<!--day.html 파일에서 사용자가 인분을 선택할 수 있는 옵션을 추가했슴
+  day.html 코드는 식단 항목을 입력하고 이를 서버로 전송하는 기능을 담당하고 있음-->
+
+<!--</form>
+<script src="{{ url_for('static', filename='script.js') }}"></script> 이 부분부터 서버 올바르게 연결되도록 코드 추가
+먼저, 입력된 식단 데이터를 JSON 문자열로 변환하여 숨겨진 필드에 저장하도록 수정합니다. -->

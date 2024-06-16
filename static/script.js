@@ -86,5 +86,3 @@ function showSuggestions(event, day) {
         suggestionsBox.innerHTML = '';
     }
 }
-
-// 
