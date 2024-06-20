@@ -17,6 +17,7 @@
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             margin-top: 20px;
+            border-radius: 8px;
         }
         h1, h2 {
             text-align: center;
@@ -40,6 +41,7 @@
         .supplement img {
             max-width: 100px;
             margin-right: 20px;
+            border-radius: 5px;
         }
         .supplement-details {
             flex: 1;
@@ -54,15 +56,39 @@
         .buy-link:hover {
             text-decoration: underline;
         }
+
+        /* Emphasizing nutrition statuses */
+        .nutrition-status {
+            margin-bottom: 20px;
+        }
+
+        .nutrition-status li {
+            margin-bottom: 10px;
+        }
+
+        .nutrition-status li:first-of-type {
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .nutrition-status li:nth-of-type(2) {
+            font-weight: bold;
+            color: #f0ad4e;
+        }
+
+        .nutrition-status li:nth-of-type(3) {
+            font-weight: bold;
+            color: #5bc0de;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>영양소 섭취 결과</h1>
         <h2>영양 섭취 상태</h2>
-        <ul>
+        <ul class="nutrition-status">
             {% for status in nutrition_status %}
-                <li>{{ status }}</li>
+                <li>{{ loop.index }}위: {{ status }}</li>
             {% endfor %}
         </ul>
         <h2>추천 영양제</h2>
@@ -89,5 +115,3 @@
     </div>
 </body>
 </html>
-
-<!--결과 페이지에서도 각 영양소가 올바르게 계산되었는지 확인합니다.-->

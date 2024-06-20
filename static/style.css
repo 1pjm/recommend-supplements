@@ -1,20 +1,31 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
 }
 
 h1, h2 {
     color: #333;
+    text-align: center;
 }
 
 form {
-    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    max-width: 600px;
 }
 
-input[type="text"], input[type="number"] {
-    width: 300px;
-    padding: 5px;
+input[type="text"], input[type="number"], select {
+    width: calc(100% - 22px);
+    padding: 10px;
     margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 input[type="text"]::placeholder, input[type="number"]::placeholder {
@@ -26,6 +37,7 @@ button {
     background-color: #4CAF50;
     color: white;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
 }
 
@@ -43,13 +55,13 @@ ul {
 }
 
 li {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
 .del-meal {
-    margin-left: 10px;
     background-color: #ff0000;
     color: white;
     border: none;
@@ -58,19 +70,27 @@ li {
     border-radius: 3px;
 }
 
-.meal-input {
-    width: 200px;
+.meal-input, .portion-input {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .suggestions {
     border: 1px solid #ddd;
-    max-height: 100px;
+    max-height: 150px;
     overflow-y: auto;
-    width: 300px;
+    width: calc(100% - 22px);
+    background: #fff;
+    position: absolute;
+    z-index: 9999;
 }
 
 .suggestions li {
-    padding: 8px;
+    padding: 10px;
     cursor: pointer;
 }
 
@@ -78,22 +98,118 @@ li {
     background-color: #f0f0f0;
 }
 
-.supplements {
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    border-radius: 8px;
+}
+
+.supplement {
     display: flex;
-    flex-wrap: wrap;
-}
-
-.supplement-item {
-    border: 1px solid #ddd;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
     padding: 10px;
-    margin: 10px;
-    width: 45%;
+    border-radius: 5px;
 }
 
-.supplement-item img {
-    max-width: 100%;
+.supplement img {
+    max-width: 100px;
+    margin-right: 20px;
+    border-radius: 5px;
 }
 
-.supplement-item p {
+.supplement-details {
+    flex: 1;
+}
+
+.supplement-details p {
     margin: 5px 0;
+}
+
+.buy-link {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.buy-link:hover {
+    text-decoration: underline;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Custom styles for edit buttons and spacing */
+.edit-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.edit-buttons button {
+    margin-right: 10px;
+}
+
+.edit-buttons:last-of-type {
+    margin-bottom: 20px;
+}
+
+/* Emphasizing nutrition statuses */
+.nutrition-status {
+    margin-bottom: 20px;
+}
+
+.nutrition-status li {
+    margin-bottom: 10px;
+}
+
+.nutrition-status li:first-of-type {
+    font-weight: bold;
+    color: #d9534f;
+}
+
+.nutrition-status li:nth-of-type(2) {
+    font-weight: bold;
+    color: #f0ad4e;
+}
+
+.nutrition-status li:nth-of-type(3) {
+    font-weight: bold;
+    color: #5bc0de;
+}
+
+/* Larger checkboxes for disease selection */
+input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-right: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group.edit-buttons:last-of-type {
+    margin-top: 30px;
 }
