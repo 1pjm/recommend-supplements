@@ -65,7 +65,7 @@ def calculate_pa_index(gender, pa_level):
         return [1.0, 1.11, 1.25, 1.48][int(pa_level)-1]
     return None
 
-def calculate_average_requirements(gender, age, pa_index, weight, height, diseases):
+def calculate_average_requirements(gender, age, pa_index, weight, height, diseases): # 성별~질병에 따른  평균 영양 권장 요구량 
     print(f"Calculating requirements for: Gender={gender}, Age={age}, PA Index={pa_index}, Weight={weight}, Height={height}, Diseases={diseases}")
     
     if gender not in ["남자", "여자"]:
@@ -237,7 +237,7 @@ def calculate_actual_intake(meals, combined_nutrition_data):
         '에너지(kcal)': 0, '단백질(g)': 0, '지방(g)': 0, '탄수화물(g)': 0,
         '칼슘(mg)': 0, '철(mg)': 0, '칼륨(mg)': 0, '비타민 A(μg RAE)': 0,
         '티아민(mg)': 0, '니아신(mg)': 0, '비타민 C(mg)': 0, '비타민 D(μg)': 0,
-        '마그네슘(㎎)': 0, '비타민 B9(μg)': 0, '비타민 B12(μg)': 0
+        '마그네슘(㎎)': 0, '엽산(DFE)(㎍)': 0, '비타민 B12(㎍)': 0
     }
 
     if isinstance(meals, str):
@@ -422,6 +422,7 @@ def result():
     print("Gap:", gap)
 
     keywords = {
+        '에너지(kcal)': '에너지 보충제',
         '단백질(g)': '단백질 영양제',
         '칼슘(mg)': '칼슘 영양제',
         '철(mg)': '철분 영양제',
@@ -463,3 +464,6 @@ def result():
 if __name__ == '__main__':
     print("Combined nutrition data loaded successfully")
     app.run(debug=True)
+
+# def calculate_actual_intake(meals, combined_nutrition_data): 함수 부분 수정
+ 
