@@ -10,7 +10,10 @@ import aiohttp  # 프로세스 속도 빨라짐
 import asyncio
 from flask_caching import Cache  # flask-caching 사용 속도 빨라짐
 
-app = Flask(__name__)
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Flask 앱 생성
+app = Flask(__name__, template_folder=current_directory, static_folder=current_directory)
 app.secret_key = 'supersecretkey'
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
