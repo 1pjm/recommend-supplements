@@ -4,3 +4,9 @@ __pycache__
 ~$식품영양성분DB_가공식품_20240416.xlsx
 nutrition.db
 search_results.csv
+combine.py
+combine2.py
+nov.py
+README.md
+crawling/
+utils/
