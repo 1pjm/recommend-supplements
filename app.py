@@ -6,9 +6,9 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import json
-import aiohttp # 프로세스 속도 빨라짐
+import aiohttp  # 프로세스 속도 빨라짐
 import asyncio
-from flask_caching import Cache #F flask-cashing 을 사용 속도 빨라짐
+from flask_caching import Cache  # flask-caching 사용 속도 빨라짐
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -47,10 +47,10 @@ def load_nutrition_data(file_path, weight_column):
 
     return data
 
-file_path = 'data/식품영양성분DB_음식_20240416.xlsx'
+file_path = '식품영양성분DB_음식_20240416.xlsx'
 nutrition_data = load_nutrition_data(file_path, '식품중량')
 
-additional_file_path = 'data/식품영양성분DB_가공식품_20240416.xlsx'
+additional_file_path = '식품영양성분DB_가공식품_20240416.xlsx'
 additional_nutrition_data = load_nutrition_data(additional_file_path, '식품중량')
 
 combined_nutrition_data = pd.concat([nutrition_data, additional_nutrition_data], ignore_index=True)
@@ -65,7 +65,7 @@ def calculate_pa_index(gender, pa_level):
         return [1.0, 1.11, 1.25, 1.48][int(pa_level)-1]
     return None
 
-def calculate_average_requirements(gender, age, pa_index, weight, height, diseases): # 성별~질병에 따른  평균 영양 권장 요구량 
+def calculate_average_requirements(gender, age, pa_index, weight, height, diseases):
     print(f"Calculating requirements for: Gender={gender}, Age={age}, PA Index={pa_index}, Weight={weight}, Height={height}, Diseases={diseases}")
     
     if gender not in ["남자", "여자"]:
@@ -209,7 +209,6 @@ def calculate_average_requirements(gender, age, pa_index, weight, height, diseas
                 print("Age out of range for recommendations")
                 return None
     
-        # 질병에 따른 조정
         if diseases["고혈압"]:
             if age >= 19:
                 calcium, potassium = 1000, 4700
@@ -279,13 +278,6 @@ def calculate_actual_intake(meals, combined_nutrition_data):
 
 def calculate_gap(nutrients, recommended_intake, actual_intake):
     return [recommended - actual for recommended, actual in zip(recommended_intake, actual_intake)]
-
-# 곱하기 인분수 * 식품중량 관련 계산
-# adjusted_value = nutrient_value * (quantity / 100) # 실제 섭취량 조정. 이 부분을 하은이랑 이야기했던 부분. 
-# nutrient_value: 각 영양소에 대한 1인분당 값 (예: 에너지 200 kcal)
-# quantity는 사용자가 입력하는 것이 아니라, 음식 정보(예: 꽁치조림)의 영양성분을 100g 기준으로 계산하는 것과 연관 
-# adjusted_value = nutrient_value * (quantity / 100) 식으로 하니, 실제 섭취량 오류 부분이 계속 되어서 챗gpt 가 말하는대로
-# adjusted_value = nutrient_value * portion * (weight / 100)로 변경해서 해보겠음. 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -437,7 +429,6 @@ def result():
         '비타민 B12(μg)': '비타민 B12 보충제'
     }
 
-    # 상위 3개의 부족한 영양소만 추출
     top_3_gap = sorted(zip(nutrients, gap), key=lambda x: x[1], reverse=True)[:3]
     top_3_keywords = [keywords[nutrient] for nutrient, diff in top_3_gap if diff > 0]
     supplements = {}
@@ -464,6 +455,3 @@ def result():
 if __name__ == '__main__':
     print("Combined nutrition data loaded successfully")
     app.run(debug=True)
-
-# def calculate_actual_intake(meals, combined_nutrition_data): 함수 부분 수정
- 
